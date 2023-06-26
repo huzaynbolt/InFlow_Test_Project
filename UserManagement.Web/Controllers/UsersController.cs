@@ -88,6 +88,23 @@ public class UsersController : Controller
         return RedirectToAction("List");
     }
 
+    [HttpGet]
+    [Route("details")]
+    public async Task<ViewResult> Details(int id)
+    {
+        var user = await _userService.Get(id);
+        var mappedUser = new UserListItemViewModel
+        {
+            DateOfBirth = user!.DateOfBirth,
+            Email = user!.Email,
+            Forename = user!.Forename,
+            IsActive = user!.IsActive,
+            Id = user.Id,
+            Surname = user!.Surname
+        };
+        return View(mappedUser);
+    }
+
 
     private static Func<User, UserListItemViewModel> ProjectUserViewModel() => p => new UserListItemViewModel
     {

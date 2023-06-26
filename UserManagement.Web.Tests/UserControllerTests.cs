@@ -84,6 +84,28 @@ public class UserControllerTests
                                                            user.Surname == c.Surname)), Times.Once);
     }
 
+    [Fact]
+    public void Details_WhenUserIsViewed_ServiceMustBeCalledToGetUser()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var userId = 12;
+        _userService.Setup(c => c.Get(It.IsAny<long>())).ReturnsAsync(new User
+        {
+            DateOfBirth = new System.DateTime(1992, 11, 01),
+            Email = "email1@test.com",
+            Forename = "fore-test-1",
+            Surname = "surname-1",
+            Id = userId
+        });
+        var controller = CreateController();
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var result = controller.Details(userId);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _userService.Verify(c => c.Get(It.Is<long>(c => c == userId)), Times.Once);
+    }
+
 
 
 
