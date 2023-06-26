@@ -16,6 +16,7 @@ public interface IUserService
 
     void Create(User user);
     void Update(User userToUpdate);
-    void Delete(long userId);
+    Task Delete(long userId);
+
     Task<User?> Get(long userId);
 }

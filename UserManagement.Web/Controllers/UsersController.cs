@@ -59,6 +59,7 @@ public class UsersController : Controller
     [Route("edit")]
     public async Task<ViewResult> Edit(int id)
     {
+        ViewData["Title"] = $"Edit user";
         var user = await _userService.Get(id);
         var mappedUser = new EditUserViewModel
         {
@@ -93,6 +94,7 @@ public class UsersController : Controller
     public async Task<ViewResult> Details(int id)
     {
         var user = await _userService.Get(id);
+        ViewData["Title"] = $"View user";
         var mappedUser = new UserListItemViewModel
         {
             DateOfBirth = user!.DateOfBirth,
@@ -103,6 +105,35 @@ public class UsersController : Controller
             Surname = user!.Surname
         };
         return View(mappedUser);
+    }
+
+
+    [HttpGet]
+    [Route("delete")]
+    public async Task<ViewResult> Delete(int id)
+    {
+        var user = await _userService.Get(id);
+        ViewData["Title"] = $"Delete user";
+        ViewData["IsDeleteEnable"] = true;
+        var mappedUser = new UserListItemViewModel
+        {
+            DateOfBirth = user!.DateOfBirth,
+            Email = user!.Email,
+            Forename = user!.Forename,
+            IsActive = user!.IsActive,
+            Id = user.Id,
+            Surname = user!.Surname
+        };
+        return View(mappedUser);
+    }
+
+    [HttpPost]
+    [Route("delete")]
+    public ActionResult Delete(long id)
+    {
+        _userService.Delete(id);
+
+        return RedirectToAction("List");
     }
 
 
