@@ -1,5 +1,4 @@
 using System.Linq;
-using FluentAssertions;
 using UserManagement.Models;
 
 namespace UserManagement.Data.Tests;
@@ -42,6 +41,24 @@ public class DataContextTests
 
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Should().NotContain(s => s.Email == entity.Email);
+    }
+
+
+    [Fact]
+    public void Create_WhenAdded_MustBeIncludeInListOfEntity()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        var context = CreateContext();
+        var entity = new User { DateOfBirth = new System.DateTime(1999, 02, 12), Email = "test@test.com",
+            Forename = "test-fore", Surname = "test-sur", IsActive = true } ;
+
+
+        // Act: Invokes the method under test with the arranged parameters.
+        context.Add(entity);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        var testUser = context.GetAll<User>(c=>c.Email == "test@test.com");
+        testUser.Should().NotBeNull();
     }
 
     private DataContext CreateContext() => new();

@@ -17,7 +17,7 @@ public class UsersController : Controller
     {
         var items = _userService.GetAll().Select(ProjectUserViewModel());
         var model = MapUserViewModel(items);
-
+        ViewData["Title"] = "List all Users";
         return View(model);
     }
 
@@ -27,8 +27,31 @@ public class UsersController : Controller
     {
         var items = _userService.FilterByActive(isActive).Select(ProjectUserViewModel());
         var model = MapUserViewModel(items);
-
+        ViewData["Title"] = $"Get {(isActive ? "active" : "inactive")} users";
         return View("/Views/Users/List.cshtml", model);
+    }
+
+
+    [HttpGet]
+    [Route("create")]
+    public ViewResult Create()
+    {
+        ViewData["Title"] = $"Add new user";
+        return View();
+    }
+
+    [HttpPost]
+    [Route("create")]
+    public ActionResult Create(AddUserViewModel user)
+    {
+        if (ModelState.IsValid)
+        {
+            var newUser = ProjectUserForCreate(user);
+            _userService.Create(newUser);
+            return RedirectToAction("List");
+        }
+
+        return View(user);
     }
 
     private static Func<User, UserListItemViewModel> ProjectUserViewModel() => p => new UserListItemViewModel
@@ -45,4 +68,19 @@ public class UsersController : Controller
     {
         Items = items.ToList()
     };
+
+    private static User ProjectUserForCreate(AddUserViewModel user)
+    {
+        return new User
+        {
+            Forename = user.Forename!,
+            Surname = user.Surname!,
+            Email = user.Email!,
+            IsActive = user.IsActive,
+            DateOfBirth = user.DateOfBirth
+        };
+    } 
+    
+
+
 }

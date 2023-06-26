@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Linq.Expressions;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using UserManagement.Models;
 
@@ -64,4 +66,10 @@ public class DataContext : DbContext, IDataContext
         base.Remove(entity);
         SaveChanges();
     }
+
+    public async Task<TEntity?> Get<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class
+    {
+        return await base.Set<TEntity>().FirstOrDefaultAsync(predicate);
+    }
+        
 }
