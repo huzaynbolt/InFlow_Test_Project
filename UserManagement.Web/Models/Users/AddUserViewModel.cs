@@ -29,3 +29,9 @@ public class AddUserViewModel
     [Required]
     public DateTime DateOfBirth { get; set; }
 }
+
+
+public class EditUserViewModel : AddUserViewModel
+{
+    public long Id { get; set; }
+}

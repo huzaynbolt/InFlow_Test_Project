@@ -1,3 +1,4 @@
+using Moq;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
@@ -29,7 +30,6 @@ public class UserControllerTests
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         _userService.Setup(c => c.Create(It.IsAny<User>()));
         var controller = CreateController();
-        var users = SetupUsers();
 
         // Act: Invokes the method under test with the arranged parameters.
         var user = new AddUserViewModel
@@ -42,9 +42,50 @@ public class UserControllerTests
         var result = controller.Create(user);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
-        _userService.Verify(c => c.Create(It.Is<User>(c => user.Email == c.Email && user.DateOfBirth == c.DateOfBirth
-         && user.IsActive == c.IsActive && user.Forename == c.Forename && user.Surname == c.Surname)), Times.Once);
+        _userService.Verify(c => c.Create(It.Is<User>(c => user.Email == c.Email &&
+                                                           user.DateOfBirth == c.DateOfBirth &&
+                                                           user.IsActive == c.IsActive &&
+                                                           user.Forename == c.Forename &&
+                                                           user.Surname == c.Surname)), Times.Once);
     }
+
+    [Fact]
+    public void Edit_WhenUserIsEdited_ServiceMustBeCalledToUpdateUser()
+    {
+        // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
+        _userService.Setup(c => c.Create(It.IsAny<User>()));
+        _userService.Setup(c => c.Get(It.IsAny<long>())).ReturnsAsync(new User
+        {
+            DateOfBirth = new System.DateTime(1992, 11, 01),
+            Email = "email1@test.com",
+            Forename = "fore-test-1",
+            Surname = "surname-1",
+            Id = 12
+        });
+        var controller = CreateController();
+
+        // Act: Invokes the method under test with the arranged parameters.
+        var user = new EditUserViewModel
+        {
+            DateOfBirth = new System.DateTime(1992, 11, 01),
+            Email = "test-email-2@test.com",
+            Forename = "fore-test-2",
+            Surname = "surname-1",
+            Id = 12
+        };
+        var result = controller.Edit(user);
+
+        // Assert: Verifies that the action of the method under test behaves as expected.
+        _userService.Verify(c => c.Update(It.Is<User>(c => user.Email == c.Email &&
+                                                           user.DateOfBirth == c.DateOfBirth &&
+                                                           user.IsActive == c.IsActive &&
+                                                           user.Forename == c.Forename &&
+                                                           user.Id == c.Id &&
+                                                           user.Surname == c.Surname)), Times.Once);
+    }
+
+
+
 
     private User[] SetupUsers(string forename = "Johnny", string surname = "User", string email = "juser@example.com", bool isActive = true)
     {

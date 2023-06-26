@@ -13,7 +13,7 @@ public class UserService : IUserService
     public UserService(IDataContext dataAccess) => _dataAccess = dataAccess;
 
     public void Create(User user) => _dataAccess.Create(user);
-    public void Delete(int userId) => throw new System.NotImplementedException();
+    public void Delete(long userId) => throw new System.NotImplementedException();
 
     /// <summary>
     /// Return users by active state
@@ -25,8 +25,12 @@ public class UserService : IUserService
         return _dataAccess.GetAll<User>(c => c.IsActive == isActive).ToList();
     }
 
-    public async Task<User?> Get(int userId) => await _dataAccess.Get<User>(c =>c.Id == userId);
+    public async Task<User?> Get(long userId) => await _dataAccess.Get<User>(c =>c.Id == userId);
 
     public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
-    public void Update(int id, User userToUpdate) => throw new System.NotImplementedException();
+    public void Update(User userToUpdate)
+    {
+        _dataAccess.Update(userToUpdate);
+        
+    }
 }

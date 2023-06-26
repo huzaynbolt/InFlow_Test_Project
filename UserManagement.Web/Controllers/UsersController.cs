@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Web.Models.Users;
@@ -53,6 +54,40 @@ public class UsersController : Controller
 
         return View(user);
     }
+
+    [HttpGet]
+    [Route("edit")]
+    public async Task<ViewResult> Edit(int id)
+    {
+        var user = await _userService.Get(id);
+        var mappedUser = new EditUserViewModel
+        {
+            DateOfBirth = user!.DateOfBirth,
+            Email = user!.Email,
+            Forename = user!.Forename,
+            IsActive = user!.IsActive,
+            Id = user.Id,
+            Surname = user!.Surname
+        };
+        return View(mappedUser);
+    }
+
+    [HttpPost]
+    [Route("edit")]
+    public async Task<ActionResult> Edit(EditUserViewModel user)
+    {
+        var updatedUser = (await _userService.Get(user.Id))!;
+        updatedUser.Surname = user.Surname!;
+        updatedUser.DateOfBirth = user!.DateOfBirth;
+        updatedUser.Email = user.Email!;
+        updatedUser.Forename = user.Forename!;
+        updatedUser.Id = user.Id;
+        updatedUser.IsActive = user.IsActive;
+
+        _userService.Update(updatedUser);
+        return RedirectToAction("List");
+    }
+
 
     private static Func<User, UserListItemViewModel> ProjectUserViewModel() => p => new UserListItemViewModel
     {

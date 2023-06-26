@@ -15,7 +15,7 @@ public interface IUserService
     IEnumerable<User> GetAll();
 
     void Create(User user);
-    void Update(int id, User userToUpdate);
-    void Delete(int userId);
-    Task<User?> Get(int userId);
+    void Update(User userToUpdate);
+    void Delete(long userId);
+    Task<User?> Get(long userId);
 }
