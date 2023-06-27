@@ -18,6 +18,11 @@ public class DataContext : DbContext, IDataContext
     }
 
 
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseInMemoryDatabase("UserManagement.Data.DataContext");
+    }
+
     protected override void OnModelCreating(ModelBuilder model)
     {
         model.Entity<User>().HasMany(c=>c.AuditLogs).WithOne(c => c.User).HasForeignKey(c => c.UserId);

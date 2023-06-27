@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Linq;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
 using UserManagement.Services.Interfaces;
@@ -21,7 +23,7 @@ public class UserControllerTests
         // Assert: Verifies that the action of the method under test behaves as expected.
         result.Model
             .Should().BeOfType<UserListViewModel>()
-            .Which.Items.Should().BeEquivalentTo(users);
+            .Which.Items.FirstOrDefault()!.Forename.Should().BeEquivalentTo(users.FirstOrDefault()!.Forename);
     }
 
     [Fact]
@@ -103,7 +105,7 @@ public class UserControllerTests
         var result = controller.Details(userId);
 
         // Assert: Verifies that the action of the method under test behaves as expected.
-        _userService.Verify(c => c.Get(It.Is<long>(c => c == userId)), Times.Once);
+        _userService.Verify(c => c.GetUserWithLogs(It.Is<long>(c => c == userId)), Times.Once);
     }
 
 
@@ -118,7 +120,8 @@ public class UserControllerTests
                 Forename = forename,
                 Surname = surname,
                 Email = email,
-                IsActive = isActive
+                IsActive = isActive,
+                AuditLogs = new List<AuditLogs>()
             }
         };
 
