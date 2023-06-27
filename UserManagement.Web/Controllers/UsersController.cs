@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using UserManagement.Models;
 using UserManagement.Services.Domain.Interfaces;
+using UserManagement.Services.Interfaces;
+using UserManagement.Web.Models;
 using UserManagement.Web.Models.Users;
 
 namespace UserManagement.WebMS.Controllers;
@@ -11,7 +13,14 @@ namespace UserManagement.WebMS.Controllers;
 public class UsersController : Controller
 {
     private readonly IUserService _userService;
-    public UsersController(IUserService userService) => _userService = userService;
+
+    private readonly IAuditLogService _auditLogService;
+    public UsersController(IUserService userService, IAuditLogService auditLogService)
+    {
+        _userService = userService;
+
+        _auditLogService = auditLogService;
+    }
 
     [HttpGet]
     public ViewResult List()
@@ -43,12 +52,18 @@ public class UsersController : Controller
 
     [HttpPost]
     [Route("create")]
-    public ActionResult Create(AddUserViewModel user)
+    public async Task<ActionResult> Create(AddUserViewModel user)
     {
         if (ModelState.IsValid)
         {
             var newUser = ProjectUserForCreate(user);
             _userService.Create(newUser);
+            await _auditLogService.CreateAsync(new AuditLogs
+            {
+                Action = "Create",
+                EntityName = "User",
+                UserId = newUser.Id,
+            });
             return RedirectToAction("List");
         }
 
@@ -86,6 +101,12 @@ public class UsersController : Controller
         updatedUser.IsActive = user.IsActive;
 
         _userService.Update(updatedUser);
+        await _auditLogService.CreateAsync(new AuditLogs
+        {
+            Action = "Update",
+            EntityName = "User",
+            UserId = user.Id,
+        });
         return RedirectToAction("List");
     }
 
@@ -93,7 +114,7 @@ public class UsersController : Controller
     [Route("details")]
     public async Task<ViewResult> Details(int id)
     {
-        var user = await _userService.Get(id);
+        var user = await _userService.GetUserWithLogs(id);
         ViewData["Title"] = $"View user";
         var mappedUser = new UserListItemViewModel
         {
@@ -102,8 +123,16 @@ public class UsersController : Controller
             Forename = user!.Forename,
             IsActive = user!.IsActive,
             Id = user.Id,
-            Surname = user!.Surname
+            Surname = user!.Surname,
+            Logs = user.AuditLogs != null ?
+                       user.AuditLogs.Select(c => AuditLogsViewModel.FromLogModel(c)).ToList() : new List<AuditLogsViewModel>()
         };
+        await _auditLogService.CreateAsync(new AuditLogs
+        {
+            Action = "Read",
+            EntityName = "User",
+            UserId = user.Id
+        });
         return View(mappedUser);
     }
 
@@ -129,10 +158,16 @@ public class UsersController : Controller
 
     [HttpPost]
     [Route("delete")]
-    public ActionResult Delete(long id)
+    public async Task<ActionResult> Delete(long id)
     {
-        _userService.Delete(id);
+        await _userService.Delete(id);
 
+        await _auditLogService.CreateAsync(new AuditLogs
+        {
+            Action = "Delete",
+            EntityName = "User",
+            UserId = id,
+        });
         return RedirectToAction("List");
     }
 
@@ -144,7 +179,9 @@ public class UsersController : Controller
         Surname = p.Surname,
         Email = p.Email,
         IsActive = p.IsActive,
-        DateOfBirth = p.DateOfBirth
+        DateOfBirth = p.DateOfBirth,
+        Logs = p.AuditLogs != null ? p.AuditLogs.Select(c=> AuditLogsViewModel.FromLogModel(c)).ToList()
+                                    : new List<AuditLogsViewModel>()
     };
 
     private static UserListViewModel MapUserViewModel(IEnumerable<UserListItemViewModel> items) => new ()

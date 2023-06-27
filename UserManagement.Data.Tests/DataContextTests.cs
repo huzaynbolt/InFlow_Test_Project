@@ -1,21 +1,26 @@
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using UserManagement.Models;
 
 namespace UserManagement.Data.Tests;
 
 public class DataContextTests
 {
+
+ 
+
     [Fact]
     public void GetAll_WhenNewEntityAdded_MustIncludeNewEntity()
     {
         // Arrange: Initializes objects and sets the value of the data that is passed to the method under test.
         var context = CreateContext();
+        context.Users!.RemoveRange(context.Users);
 
         var entity = new User
         {
             Forename = "Brand New",
             Surname = "User",
-            Email = "brandnewuser@example.com"
+            Email = "brandnewuser@example.com",
         };
         context.Create(entity);
 

@@ -20,6 +20,38 @@
         <dt>Date of Birth</dt>
         <dd>@Model.DateOfBirth.ToString("yyyy-MM-dd")</dd>
     </dl>
+
+    <hr />
+    <h4>Change Logs </h4>
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Entity</th>
+                <th>Action</th>
+                <th>Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Logs)
+            {
+                <tr>
+                    <td>
+                        @item.Id
+                    </td>
+                    <td>
+                        @item.EntityName
+                    </td>
+                    <td>
+                        @item.Action
+                    </td>
+                    <td>
+                        @item.Date.ToShortDateString()
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
 </div>
 
 <p>

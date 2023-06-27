@@ -15,8 +15,11 @@ public class DataContext : DbContext, IDataContext
         => options.UseInMemoryDatabase("UserManagement.Data.DataContext");
 
     protected override void OnModelCreating(ModelBuilder model)
-        => model.Entity<User>().HasData(new[]
-        {
+    {
+        model.Entity<User>().HasMany(c=>c.AuditLogs).WithOne(c => c.User).HasForeignKey(c => c.UserId);
+
+        model.Entity<User>().HasData(new[]
+                {
             new User { Id = 1, Forename = "Peter", Surname = "Loew", Email = "ploew@example.com", IsActive = true,
                 DateOfBirth = new DateTime(1992, 09, 10) },
             new User { Id = 2, Forename = "Benjamin Franklin", Surname = "Gates", Email = "bfgates@example.com", IsActive = true,
@@ -40,8 +43,12 @@ public class DataContext : DbContext, IDataContext
             new User { Id = 11, Forename = "Robin", Surname = "Feld", Email = "rfeld@example.com", IsActive = true,
                 DateOfBirth = new DateTime(1999, 11, 10) },
         });
+    }
+       
 
     public DbSet<User>? Users { get; set; }
+
+    public DbSet<AuditLogs>? AuditLogs { get; set; }
 
     public IQueryable<TEntity> GetAll<TEntity>() where TEntity : class
         => base.Set<TEntity>();
@@ -71,5 +78,9 @@ public class DataContext : DbContext, IDataContext
     {
         return await base.Set<TEntity>().FirstOrDefaultAsync(predicate);
     }
-        
+
+    public async Task<TEntity?> Get<TEntity>(Expression<Func<TEntity, bool>> predicate, string includedEntity) where TEntity : class
+    {
+        return await base.Set<TEntity>().Include(includedEntity).FirstOrDefaultAsync(predicate);
+    }
 }

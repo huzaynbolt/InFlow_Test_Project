@@ -1,0 +1,73 @@
+﻿@model UserManagement.Web.Models.PaginationViewModel<UserManagement.Web.Models.AuditLogsViewModel>
+<h2>View logs</h2>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Entity</th>
+                <th>Date</th>
+                <th style="width: 1px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Items)
+            {
+                <tr>
+                    <td>
+                        @item.Id
+                    </td>
+                    <td>
+                        @item.EntityName
+                    </td>
+                    <td>
+                        @item.Date.ToShortDateString()
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <button type="button" class="btn btn-default dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false" id="btnToggleActions">
+                                Actions
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="btnToggleActions">
+                                <form method="post" action="@Url.Action("LogDetails", "Logs", new { id = item.Id })">
+                                    @Html.AntiForgeryToken()
+                                    <button type="submit" class="btn btn-link">View Details</button>
+                                </form>
+                            </ul>
+                        </div>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <nav>
+        <ul class="pagination">
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.CurrentPage ? "active" : "")">
+                    <a class=" btn btn-link page-link"  asp-controller="Logs" asp-action="Index" asp-route-id="@i">@i</a>
+                </li>
+            }
+        </ul>
+    </nav>
+
+    @if (Model.Items.Any())
+    {
+        <div class="col-md-8">
+            <h4>Log Details</h4>
+            <div class="card">
+                <div class="card-body">
+                    @if (TempData["LogDetails"] != null)
+                    {
+                        <p>@TempData["LogDetails"]</p>
+                    }
+                    else
+                    {
+                        <p class="alert alert-warning" role="alert"> Select a log from the list to view details. </p>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+</div>

@@ -22,6 +22,14 @@ public interface IDataContext
     Task<TEntity?> Get<TEntity>(Expression<Func<TEntity, bool>> predicate) where TEntity : class;
 
     /// <summary>
+    /// Get a single entity
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="includedEntity">CSV values of child entity to be included</param>
+    /// <returns>TEntity</returns>
+    Task<TEntity?> Get<TEntity>(Expression<Func<TEntity, bool>> predicate, string includedEntity) where TEntity : class;
+
+    /// <summary>
     /// Get a list of items
     /// </summary>
     /// <typeparam name="TEntity"></typeparam>

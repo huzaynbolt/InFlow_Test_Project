@@ -29,7 +29,14 @@ public class UserService : IUserService
         return _dataAccess.GetAll<User>(c => c.IsActive == isActive).ToList();
     }
 
-    public async Task<User?> Get(long userId) => await _dataAccess.Get<User>(c =>c.Id == userId);
+    public async Task<User?> Get(long userId){
+        return (await _dataAccess.Get<User>(c => c.Id == userId));
+    }
+
+    public async Task<User?> GetUserWithLogs(long userId)
+    {
+        return (await _dataAccess.Get<User>(c => c.Id == userId, "AuditLogs"));
+    }
 
     public IEnumerable<User> GetAll() => _dataAccess.GetAll<User>();
 

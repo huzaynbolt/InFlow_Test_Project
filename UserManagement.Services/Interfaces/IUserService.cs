@@ -19,4 +19,5 @@ public interface IUserService
     Task Delete(long userId);
 
     Task<User?> Get(long userId);
+    Task<User?> GetUserWithLogs(long userId);
 }
