@@ -11,8 +11,12 @@ public class DataContext : DbContext, IDataContext
 {
     public DataContext() => Database.EnsureCreated();
 
-    protected override void OnConfiguring(DbContextOptionsBuilder options)
-        => options.UseInMemoryDatabase("UserManagement.Data.DataContext");
+    public DataContext(DbContextOptions<DataContext> options)
+       : base(options)
+    {
+        Database.EnsureCreated();
+    }
+
 
     protected override void OnModelCreating(ModelBuilder model)
     {

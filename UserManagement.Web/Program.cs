@@ -1,12 +1,15 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Westwind.AspNetCore.Markdown;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+
+var useInMemoryDB = builder.Configuration.GetValue<bool>("UseInMemoryDB");
 builder.Services
-    .AddDataAccess()
+    .AddDataAccess(useInMemoryDB)
     .AddDomainServices()
     .AddMarkdown()
     .AddControllersWithViews();

@@ -2,6 +2,7 @@
 
   <ItemGroup>
     <PackageReference Include="Westwind.AspNetCore.Markdown" Version="3.11.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="7.0.5" />
   </ItemGroup>
 
   <ItemGroup>
